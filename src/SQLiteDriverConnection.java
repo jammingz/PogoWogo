@@ -242,13 +242,15 @@ public class SQLiteDriverConnection {
     }
 
     public static void main(String[] args) {
+        // DEBUGGING:
+
         // connect();
-        SQLiteDriverConnection conn = new SQLiteDriverConnection();
+        // SQLiteDriverConnection conn = new SQLiteDriverConnection();
 
         // Pokemon test = conn.selectPokemonById(1);
         //conn.printPokemonObject(test);
 
-        System.out.println("CPM: " + String.valueOf(conn.selectCpmByLevel(40)));
+        //System.out.println("CPM: " + String.valueOf(conn.selectCpmByLevel(40)));
 
 
         // conn.createNewTable();
