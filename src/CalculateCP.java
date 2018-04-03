@@ -10,6 +10,12 @@ public class CalculateCP {
         int defIV = 15; // default IV for perfect pokemon
         int staIV = 15; // default IV for perfect pokemon
 
+        System.out.println("CalculateCP(" + pkmn.getName() + "): "
+                            + "atk: " + String.valueOf(attack) + ", "
+                            + "def: " + String.valueOf(defense) + ", "
+                            + "spatk: " + String.valueOf(spAttack) + ", "
+                            + "spdef: " + String.valueOf(spDefense) + ", "
+                            + "spd: " + String.valueOf(speed));
 
         // Converting original stats into Pokemon Go's base attack, defense, and stamina stats.
         int baseAtk = getBaseAttack(attack, spAttack, speed);
@@ -20,6 +26,12 @@ public class CalculateCP {
         SQLiteDriverConnection conn = new SQLiteDriverConnection();
         double cpm = conn.selectCpmByLevel(level);
 
+        System.out.println("CalculateCP(): " +
+                            "baseAtk: " + String.valueOf(baseAtk) + ", " +
+                            "baseDef: " + String.valueOf(baseDef) + ", " +
+                            "baseSta: " + String.valueOf(baseSta) + ", " +
+                            "cpm: " + String.valueOf(cpm));
+
         // Calculate the CP.
         double cp = (baseAtk+atkIV) * Math.sqrt(baseDef + defIV) * Math.sqrt(baseSta + staIV) * Math.pow(cpm, 2) / 10;
         return cp; // Default value
@@ -27,7 +39,8 @@ public class CalculateCP {
 
     public static double calculateCPByName(String name, double level) {
         SQLiteDriverConnection conn = new SQLiteDriverConnection();
-        Pokemon pkmn = conn.selectPokemonByName(name);
+        // Pokemon pkmn = conn.selectPokemonByName(name);
+        Pokemon pkmn = conn.selectPokemonById(65);
         double cp = calculateCP(pkmn, level);
         System.out.println(name + "(" + String.valueOf(level) + "): " + String.valueOf(cp));
         return cp;
@@ -47,8 +60,9 @@ public class CalculateCP {
             lower = phystat;
         }
 
-        double scaledAtk = Math.round(2 * (7/8 * higher + 1/8 * lower));
-
+        System.out.println("Higher: " + String.valueOf(higher) + ", Lower: " + String.valueOf(lower));
+        double scaledAtk = Math.round(2 * (higher * 7/8 + lower / 8));
+        System.out.println("Scaled: " + String.valueOf(scaledAtk));
         return (int) Math.round(scaledAtk * speedMod);
     }
 

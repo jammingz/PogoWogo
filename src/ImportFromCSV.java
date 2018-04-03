@@ -116,6 +116,6 @@ public class ImportFromCSV {
 
     public static void main(String[] args) {
         // importFromFile(args[0]);
-        importCPMFromFile(args[0]);
+        // importCPMFromFile(args[0]);
     }
 }
