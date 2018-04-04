@@ -45,6 +45,47 @@ public class SQLiteDriverConnection {
         }
     }
 
+    // This table is for converted Monsters.
+    public void createNewNiaTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS converted {\n"
+                + "id integer PRIMARY KEY,\n"
+                + "name text NOT NULL,\n"
+                + "type1 integer NOT NULL,\n"
+                + "type2 integer,\n"
+                + "maxCP integer NOT NULL, \n"
+                + "sta integer NOT NULL,\n"
+                + "atk integer NOT NULL,\n"
+                + "def integer NOT NULL,\n"
+                + "generation integer NOT NULL,\n"
+                + "legendary integer NOT NULL\n"
+                + ";";
+    }
+
+    public void insertNiaStats(String name, int type1, int type2, int cp, int sta, int atk, int def, int gen, boolean legendary) {
+        String sql = "INSERT INTO stats(name, type1, type2, maxCP, sta, atk, def, generation, legendary) VALUES(?,?,?,?,?,?,?,?,?)";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int isLegendary = 0;
+            if (legendary) {
+                isLegendary = 1;
+            }
+            pstmt.setString(1, name);
+            pstmt.setInt(2, type1);
+            pstmt.setInt(3, type2);
+            pstmt.setInt(4, cp);
+            pstmt.setInt(5, sta);
+            pstmt.setInt(6, atk);
+            pstmt.setInt(7, def);
+            pstmt.setInt(11, gen);
+            pstmt.setInt(12, isLegendary);
+            pstmt.executeUpdate();
+
+            System.out.println("Inserting Nia entry: " + name);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
 
     public void insertStats(String name, int type1, int type2, int total, int hp, int atk, int def, int spatk, int spdef, int spd, int gen, boolean legendary) {
         String sql = "INSERT INTO stats(name, type1, type2, total, hp, atk, def, spatk, spdef, spd, generation, legendary) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -83,7 +124,7 @@ public class SQLiteDriverConnection {
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             // Set value
-            pstmt.setString(1, pokemonName);
+            pstmt.setString(1, pokemonName.toLowerCase());
 
             ResultSet res = pstmt.executeQuery();
 
@@ -245,7 +286,10 @@ public class SQLiteDriverConnection {
         // DEBUGGING:
 
         // connect();
-        // SQLiteDriverConnection conn = new SQLiteDriverConnection();
+        SQLiteDriverConnection conn = new SQLiteDriverConnection();
+        conn.createNewTable();
+        conn.createNewCpmTable();
+        conn.createNewNiaTable();
 
         // Pokemon test = conn.selectPokemonById(1);
         //conn.printPokemonObject(test);

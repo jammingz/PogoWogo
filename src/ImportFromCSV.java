@@ -24,7 +24,7 @@ public class ImportFromCSV {
                             // New pokemon and is not a different form of previous pokemon
 
                             SQLiteDriverConnection conn = new SQLiteDriverConnection();
-                            String name = results[1];
+                            String name = results[1].toLowerCase();
                             int type1 = Type.getType(results[2]);
                             int type2 = Type.getType(results[3]);
                             int total = Integer.parseInt(results[4]);
@@ -115,7 +115,7 @@ public class ImportFromCSV {
 
 
     public static void main(String[] args) {
-        // importFromFile(args[0]);
-        // importCPMFromFile(args[0]);
+        importFromFile(args[0]);
+        importCPMFromFile(args[1]);
     }
 }
