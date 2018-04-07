@@ -47,7 +47,7 @@ public class SQLiteDriverConnection {
 
     // This table is for converted Monsters.
     public void createNewNiaTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS converted {\n"
+        String sql = "CREATE TABLE IF NOT EXISTS converted (\n"
                 + "id integer PRIMARY KEY,\n"
                 + "name text NOT NULL,\n"
                 + "type1 integer NOT NULL,\n"
@@ -58,7 +58,15 @@ public class SQLiteDriverConnection {
                 + "def integer NOT NULL,\n"
                 + "generation integer NOT NULL,\n"
                 + "legendary integer NOT NULL\n"
-                + ";";
+                + ");";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()
+        ) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void insertNiaStats(String name, int type1, int type2, int cp, int sta, int atk, int def, int gen, boolean legendary) {
@@ -246,6 +254,30 @@ public class SQLiteDriverConnection {
             pstmt.executeUpdate();
 
             System.out.println("Inserting cpm to database: [Level: " + String.valueOf(level) + " , CPM: " + String.valueOf(cpm) + "]");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void insertNiaPkmn(PGoPokemon pkmn) {
+        String sql = "INSERT INTO converted(name, type1, type2, maxCP, sta, atk, def, generation, legendary) VALUES (?,?,?,?,?,?,?,?,?)";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int maxCP = (int) Math.round(CalculateCP.calculateCP(pkmn, 40.0));
+            int isLegend = 0;
+            if (pkmn.isLegendary()) {
+                isLegend = 1;
+            }
+            pstmt.setString(1, pkmn.getName());
+            pstmt.setInt(2, pkmn.getType1());
+            pstmt.setInt(3, pkmn.getType2());
+            pstmt.setInt(4, maxCP);
+            pstmt.setInt(5, pkmn.getSta());
+            pstmt.setInt(6, pkmn.getAtk());
+            pstmt.setInt(7, pkmn.getDef());
+            pstmt.setInt(8, pkmn.getGen());
+            pstmt.setInt(9, isLegend);
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

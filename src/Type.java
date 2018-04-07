@@ -14,6 +14,9 @@ public class Type {
     public static final int DRAGON = 11;
     public static final int FIGHTING = 12;
     public static final int POISON = 13;
+    public static final int ELECTRIC = 14;
+    public static final int PSYCHIC = 15;
+    public static final int NORMAL = 16;
 
     public static String getName(int num) {
         switch(num){
@@ -31,6 +34,9 @@ public class Type {
             case DRAGON: return "DRAGON";
             case FIGHTING: return "FIGHTING";
             case POISON: return "POISON";
+            case ELECTRIC: return "ELECTRIC";
+            case PSYCHIC: return "PSYCHIC";
+            case NORMAL: return "NORMAL";
         }
         return "Not valid typing";
     }
@@ -50,6 +56,9 @@ public class Type {
             case "dragon": return DRAGON;
             case "fighting": return FIGHTING;
             case "poison": return POISON;
+            case "electric": return  ELECTRIC;
+            case "psychic": return PSYCHIC;
+            case "normal": return NORMAL;
         }
 
         System.out.println("WARNING: Cannot find Typing. Returning NONE");
