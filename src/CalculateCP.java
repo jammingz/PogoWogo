@@ -1,3 +1,5 @@
+import java.util.stream.IntStream;
+
 public class CalculateCP {
     public static double calculateCP(PGoPokemon pkmn, double level) {
         int atkIV = 15; // default IV for perfect pokemon
@@ -94,8 +96,8 @@ public class CalculateCP {
         int baseDef = getBaseDefense(defense, spDefense, speed);
         int baseSta = getBaseStamina(hp);
 
-        // Adjust stats for legendary. Multiply every stat by 0.9 if it's a legendary
-        if (legendary) {
+        // Adjust stats for nerfed pkmn. Multiply every stat by 0.9 if it's nerfed
+        if (isNerfed(id)) {
             baseAtk *= 0.91;
             baseDef *= 0.91;
             baseSta *= 0.91;
@@ -103,6 +105,43 @@ public class CalculateCP {
 
         PGoPokemon newPokemon = new PGoPokemon(id, name, type1, type2, baseSta, baseAtk, baseDef, gen, legendary);
         return newPokemon;
+    }
+
+    /*
+     * Special list for nerfed pkmn
+     * - Mewtwo (gen1)
+     * - Ho-oh (gen2)
+     * - Groudon (gen3)
+     * - Kyogre (gen3)
+     * - Rayquaza (gen3)
+     * - Slaking (gen3)
+     */
+    public static boolean isNerfed(int id) {
+        int MEWTWO = 150;
+        int HOOH = 250;
+        int SLAKING = 289;
+        int KYOGRE = 382;
+        int GROUDON = 383;
+        int RAYQUAZA = 384;
+
+        int[] nerfedArray = {
+                MEWTWO,
+                HOOH,
+                SLAKING,
+                KYOGRE,
+                GROUDON,
+                RAYQUAZA
+        };
+
+
+        for (int i : nerfedArray) {
+            if (id == i) {
+                return true; // yes, this id for the pokemon is nerfed
+            }
+        }
+
+        // not part of the nerf pool
+        return false;
     }
 
 
