@@ -53,9 +53,9 @@ public class SQLiteDriverConnection {
                 + "type1 integer NOT NULL,\n"
                 + "type2 integer,\n"
                 + "maxCP integer NOT NULL, \n"
-                + "sta integer NOT NULL,\n"
-                + "atk integer NOT NULL,\n"
-                + "def integer NOT NULL,\n"
+                + "sta real NOT NULL,\n"
+                + "atk real NOT NULL,\n"
+                + "def real NOT NULL,\n"
                 + "generation integer NOT NULL,\n"
                 + "legendary integer NOT NULL\n"
                 + ");";
@@ -69,7 +69,7 @@ public class SQLiteDriverConnection {
         }
     }
 
-    public void insertNiaStats(String name, int type1, int type2, int cp, int sta, int atk, int def, int gen, boolean legendary) {
+    public void insertNiaStats(String name, int type1, int type2, int cp, double sta, double atk, double def, int gen, boolean legendary) {
         String sql = "INSERT INTO stats(name, type1, type2, maxCP, sta, atk, def, generation, legendary) VALUES(?,?,?,?,?,?,?,?,?)";
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -81,9 +81,9 @@ public class SQLiteDriverConnection {
             pstmt.setInt(2, type1);
             pstmt.setInt(3, type2);
             pstmt.setInt(4, cp);
-            pstmt.setInt(5, sta);
-            pstmt.setInt(6, atk);
-            pstmt.setInt(7, def);
+            pstmt.setDouble(5, sta);
+            pstmt.setDouble(6, atk);
+            pstmt.setDouble(7, def);
             pstmt.setInt(11, gen);
             pstmt.setInt(12, isLegendary);
             pstmt.executeUpdate();
@@ -263,7 +263,7 @@ public class SQLiteDriverConnection {
         String sql = "INSERT INTO converted(name, type1, type2, maxCP, sta, atk, def, generation, legendary) VALUES (?,?,?,?,?,?,?,?,?)";
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            int maxCP = (int) Math.round(CalculateCP.calculateCP(pkmn, 40.0));
+            int maxCP = CalculateCP.calculateCP(pkmn, 40.0);
             int isLegend = 0;
             if (pkmn.isLegendary()) {
                 isLegend = 1;
@@ -272,9 +272,9 @@ public class SQLiteDriverConnection {
             pstmt.setInt(2, pkmn.getType1());
             pstmt.setInt(3, pkmn.getType2());
             pstmt.setInt(4, maxCP);
-            pstmt.setInt(5, pkmn.getSta());
-            pstmt.setInt(6, pkmn.getAtk());
-            pstmt.setInt(7, pkmn.getDef());
+            pstmt.setDouble(5, pkmn.getSta());
+            pstmt.setDouble(6, pkmn.getAtk());
+            pstmt.setDouble(7, pkmn.getDef());
             pstmt.setInt(8, pkmn.getGen());
             pstmt.setInt(9, isLegend);
             pstmt.executeUpdate();

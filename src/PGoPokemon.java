@@ -5,9 +5,9 @@ public class PGoPokemon {
     private String name;
     private int type1;
     private int type2;
-    private int sta;
-    private int atk;
-    private int def;
+    private double sta;
+    private double atk;
+    private double def;
     private int gen;
     private boolean legendary;
 
@@ -16,14 +16,14 @@ public class PGoPokemon {
         this.name = null;
         this.type1 = -1;
         this.type2 = -2;
-        this.sta = 0;
-        this.atk = 0;
-        this.def = 0;
+        this.sta = 0.0;
+        this.atk = 0.0;
+        this.def = 0.0;
         this.gen = 0;
         this.legendary = false;
     }
 
-    public PGoPokemon(int pid, String pname, int ptype1, int ptype2, int psta, int patk, int pdef, int pgen, boolean plegendary) {
+    public PGoPokemon(int pid, String pname, int ptype1, int ptype2, double psta, double patk, double pdef, int pgen, boolean plegendary) {
         this.id = pid;
         this.name = pname;
         this.type1 = ptype1;
@@ -49,15 +49,15 @@ public class PGoPokemon {
         return type2;
     }
 
-    public int getSta() {
+    public double getSta() {
         return sta;
     }
 
-    public int getAtk() {
+    public double getAtk() {
         return atk;
     }
 
-    public int getDef() {
+    public double getDef() {
         return def;
     }
 

@@ -1,14 +1,14 @@
 import java.util.stream.IntStream;
 
 public class CalculateCP {
-    public static double calculateCP(PGoPokemon pkmn, double level) {
+    public static int calculateCP(PGoPokemon pkmn, double level) {
         int atkIV = 15; // default IV for perfect pokemon
         int defIV = 15; // default IV for perfect pokemon
         int staIV = 15; // default IV for perfect pokemon
 
-        int baseAtk = pkmn.getAtk();
-        int baseDef = pkmn.getDef();
-        int baseSta = pkmn.getSta();
+        int baseAtk = (int) Math.round(pkmn.getAtk());
+        int baseDef = (int) Math.round(pkmn.getDef());
+        int baseSta = (int) Math.round(pkmn.getSta());
 
 
         // Fetching cpm from database based off of pokemon's level
@@ -24,7 +24,8 @@ public class CalculateCP {
         */
 
         // Calculate the CP.
-        double cp = (baseAtk+atkIV) * Math.sqrt(baseDef + defIV) * Math.sqrt(baseSta + staIV) * Math.pow(cpm, 2) / 10.0;
+        int cp = (int) Math.floor((baseAtk+atkIV) * Math.sqrt(baseDef + defIV) * Math.sqrt(baseSta + staIV) * Math.pow(cpm, 2) / 10.0);
+        // System.out.println("CP: " + String.valueOf(cp) + ", ATK: " + String.valueOf(baseAtk) + ", DEF:" + String.valueOf(baseDef) + ", STA: " + String.valueOf(baseSta));
         return cp; // Default value
     }
 
@@ -41,13 +42,11 @@ public class CalculateCP {
         SQLiteDriverConnection conn = new SQLiteDriverConnection();
         Pokemon pkmn = conn.selectPokemonById(id);
         PGoPokemon niaPkmn = convertToNiaPokemon(pkmn);
-        double cp = calculateCP(niaPkmn, level);
-        System.out.println(pkmn.getName() + "(" + String.valueOf(level) + "): " + String.valueOf(cp));
-        return (int) Math.round(cp);
+        return calculateCP(niaPkmn, level);
     }
 
 
-    public static int getBaseStat(int phystat, int spstat, int speed) {
+    public static double getBaseStat(int phystat, int spstat, int speed) {
         double speedMod = 1 + ((double)speed - 75.0)/500.0;
         int lower = 0;
         int higher = 0;
@@ -64,14 +63,14 @@ public class CalculateCP {
         double scaledAtk = Math.round(2.0 * (7.0/8.0 * higher + lower / 8.0));
         System.out.println("Scaled: " + String.valueOf(scaledAtk));
         System.out.println("Speed Mod: " + String.valueOf(speedMod));
-        return (int) Math.round(scaledAtk * speedMod);
+        return scaledAtk * speedMod;
     }
 
-    public static int getBaseAttack(int attack, int spatk, int speed) {
+    public static double getBaseAttack(int attack, int spatk, int speed) {
         return getBaseStat(attack, spatk, speed);
     }
 
-    public static int getBaseDefense(int defense, int spdef, int speed) {
+    public static double getBaseDefense(int defense, int spdef, int speed) {
         return getBaseStat(defense, spdef, speed);
     }
 
@@ -92,9 +91,9 @@ public class CalculateCP {
         int gen = pkmn.getGeneration();
 
         // Converting original stats into Pokemon Go's base attack, defense, and stamina stats.
-        int baseAtk = getBaseAttack(attack, spAttack, speed);
-        int baseDef = getBaseDefense(defense, spDefense, speed);
-        int baseSta = getBaseStamina(hp);
+        double baseAtk = getBaseAttack(attack, spAttack, speed);
+        double baseDef = getBaseDefense(defense, spDefense, speed);
+        double baseSta = getBaseStamina(hp);
 
         // Adjust stats for nerfed pkmn. Multiply every stat by 0.9 if it's nerfed
         if (isNerfed(id)) {
@@ -147,7 +146,7 @@ public class CalculateCP {
 
     public static void main(String[] args) {
         // calculateCPByName("Alakazam", 40);
-        calculateCPById(151, 40);
+        calculateCPById(386, 40);
     }
 
 }
