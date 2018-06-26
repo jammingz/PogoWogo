@@ -20,10 +20,16 @@ public class ImportFromCSV {
                 if (results.length > 2) {
                     try {
                         int currentID = Integer.parseInt(results[0]);
+                        SQLiteDriverConnection2 conn = new SQLiteDriverConnection2();
+
                         if (currentID > counter) {
                             // New pokemon and is not a different form of previous pokemon
 
-                            SQLiteDriverConnection conn = new SQLiteDriverConnection();
+                            if (currentID > 386) {
+                                return 1; // We exit after we finish exporting gen3
+                            }
+
+
                             String name = results[1].toLowerCase();
                             int type1 = Type.getType(results[2]);
                             int type2 = Type.getType(results[3]);
@@ -38,9 +44,16 @@ public class ImportFromCSV {
                             boolean legendary = Boolean.parseBoolean(results[12]);
 
                             conn.insertStats(name, type1, type2, total, hp, atk, def, spatk, spdef, spd, gen, legendary);
+
+                            Pokemon pkmn = new Pokemon(counter, name, type1, type2, total, hp, atk, def, spatk, spdef, spd, gen, legendary);
+                            PGoPokemon niaPkmn = CalculateCP.convertToNiaPokemon(pkmn);
+
+                            // Insert NiaPkmn into database
+                            conn.insertNiaPkmn(niaPkmn);
+
                             counter++;
 
-                            System.out.println("Importing: " + name);
+                            System.out.println("Importing: " + name + "[" + String.valueOf(currentID) + "]");
                         }
 
                     } catch (NumberFormatException e) {
@@ -114,8 +127,15 @@ public class ImportFromCSV {
     }
 
 
+
     public static void main(String[] args) {
-        importFromFile(args[0]);
+        SQLiteDriverConnection2 createTables = new SQLiteDriverConnection2();
+        createTables.createNewTable();
+        createTables.createNewNiaTable();
+        createTables.createNewCpmTable();
+
         importCPMFromFile(args[1]);
+        importFromFile(args[0]);
+
     }
 }

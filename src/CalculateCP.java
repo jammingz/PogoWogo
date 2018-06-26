@@ -29,6 +29,37 @@ public class CalculateCP {
         return cp; // Default value
     }
 
+    public static int calculateCP(PGoPokemon pkmn, double cpm, int atkIV, int defIV, int staIV) {
+        int baseAtk = (int) Math.round(pkmn.getAtk());
+        int baseDef = (int) Math.round(pkmn.getDef());
+        int baseSta = (int) Math.round(pkmn.getSta());
+
+        // Calculate the CP.
+        int cp = (int) Math.floor((baseAtk+atkIV) * Math.sqrt(baseDef + defIV) * Math.sqrt(baseSta + staIV) * Math.pow(cpm, 2) / 10.0);
+        return cp; // Default value
+    }
+
+
+    public static int calculateCP(PGoPokemon pkmn, double level, int atkIV, int defIV, int staIV, double cpm) {
+        int baseAtk = (int) Math.round(pkmn.getAtk());
+        int baseDef = (int) Math.round(pkmn.getDef());
+        int baseSta = (int) Math.round(pkmn.getSta());
+
+        /*
+        System.out.println("CalculateCP(): " +
+                            "baseAtk: " + String.valueOf(baseAtk) + ", " +
+                            "baseDef: " + String.valueOf(baseDef) + ", " +
+                            "baseSta: " + String.valueOf(baseSta) + ", " +
+                            "cpm: " + String.valueOf(cpm));
+        */
+
+        // Calculate the CP.
+        int cp = (int) Math.floor((baseAtk+atkIV) * Math.sqrt(baseDef + defIV) * Math.sqrt(baseSta + staIV) * Math.pow(cpm, 2) / 10.0);
+        // System.out.println("CP: " + String.valueOf(cp) + ", ATK: " + String.valueOf(baseAtk) + ", DEF:" + String.valueOf(baseDef) + ", STA: " + String.valueOf(baseSta));
+        return cp; // Default value
+    }
+
+
     public static int calculateCPByName(String name, double level) {
         SQLiteDriverConnection conn = new SQLiteDriverConnection();
         Pokemon pkmn = conn.selectPokemonByName(name);
@@ -123,6 +154,13 @@ public class CalculateCP {
         int GROUDON = 383;
         int RAYQUAZA = 384;
 
+        int DIALGA = 483;
+        int PALKIA = 484;
+        int GIRATINA = 487;
+        int RESHIRAM = 643;
+        int ZEKROM = 644;
+        int KYUREM = 646;
+
         int[] nerfedArray = {
                 MEWTWO,
                 HOOH,
@@ -130,6 +168,13 @@ public class CalculateCP {
                 KYOGRE,
                 GROUDON,
                 RAYQUAZA
+
+                , DIALGA,
+                PALKIA,
+                GIRATINA,
+                RESHIRAM,
+                ZEKROM,
+                KYUREM
         };
 
 
@@ -143,10 +188,37 @@ public class CalculateCP {
         return false;
     }
 
+    public static void getIVsFromCP(String name, int CP) {
+        SQLiteDriverConnection conn = new SQLiteDriverConnection();
+        Pokemon pkmn = conn.selectPokemonByName(name);
+        PGoPokemon niaPkmn = convertToNiaPokemon(pkmn);
+
+        // Iterate across all 4096 IVs
+        for (double level = 0.0; level <= 40.0; level += 0.5) {
+            // Fetching cpm from database based off of pokemon's level
+            double cpm = conn.selectCpmByLevel(level);
+            for (int atkIV = 0; atkIV < 16; atkIV++) {
+                for (int defIV = 0; defIV < 16; defIV++) {
+                    for (int staIV = 0; staIV < 16; staIV++) {
+                        int curCP = calculateCP(niaPkmn, level, atkIV, defIV, staIV, cpm);
+                        if (curCP == CP) {
+                            System.out.println("[Level: " + String.valueOf(level) + ", IVs:(" + String.valueOf(atkIV) + "/" + String.valueOf(defIV) + "/" + String.valueOf(staIV) +" )]");
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println("Complete!");
+    }
+
 
     public static void main(String[] args) {
         // calculateCPByName("Alakazam", 40);
-        calculateCPById(386, 40);
+       // calculateCPById(386, 40);
+        // getIVsFromCP("Chansey", 829);
+        calculateCPByName("Zapdos", 15);
+
     }
 
 }
