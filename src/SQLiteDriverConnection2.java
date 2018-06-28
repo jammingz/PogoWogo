@@ -1,7 +1,7 @@
 import java.sql.*;
 
 public class SQLiteDriverConnection2 {
-    public static final String url = "jdbc:sqlite:stats.db";
+    public static final String url = "jdbc:sqlite:TeamIVChecker.db";
 
     public SQLiteDriverConnection2() {
 
@@ -241,10 +241,20 @@ public class SQLiteDriverConnection2 {
             // Logging details
             String name = pkmn.getName();
 
-            // Now to iterate across IVs. We first test a less intensive case and only try IVs above 13
-            for (int atkIV = 0; atkIV < 16; atkIV++) {
-                for (int defIV = 0; defIV < 16; defIV++) {
-                    for (int staIV = 0; staIV < 16; staIV++) {
+            String sql = "INSERT INTO NiaPkmnStats(Name, Level, Cp, Atkiv, Defiv, Staiv, IvPercent) VALUES (?,?,?,?,?,?,?)";
+            int i = 0;
+
+
+            try (
+                    Connection conn = this.connect();
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
+            ) {
+
+                conn.setAutoCommit(false);
+                // Now to iterate across IVs. We first test a less intensive case and only try IVs above 13
+                for (int atkIV = 0; atkIV < 16; atkIV++) {
+                    for (int defIV = 0; defIV < 16; defIV++) {
+                        for (int staIV = 0; staIV < 16; staIV++) {
 
                         /* No filter for now
                         if (atkIV + defIV + staIV < 42) { // We filter to 93% or higher
@@ -252,31 +262,52 @@ public class SQLiteDriverConnection2 {
                         }
                         */
 
-                        int CP = CalculateCP.calculateCP(pkmn, cpm, atkIV, defIV, staIV);
+                            int CP = CalculateCP.calculateCP(pkmn, cpm, atkIV, defIV, staIV);
 
+                        /*
                         insertNiaStats(
                                 pkmn.getName(),
                                 level,
                                 CP,
                                 atkIV,
                                 defIV,
-                                staIV
+                                staIV,
+                                conn
                         );
+                        */
 
-                        System.out.println("Adding " + name + " (LV" + String.valueOf(level) + ") [" + String.valueOf(atkIV) + "/" + String.valueOf(defIV) + "/" + String.valueOf(staIV) + "] to Database!");
+                            pstmt.setString(1, name);
+                            pstmt.setDouble(2, level);
+                            pstmt.setInt(3, CP);
+                            pstmt.setInt(4, atkIV);
+                            pstmt.setInt(5, defIV);
+                            pstmt.setInt(6, staIV);
+                            pstmt.setInt(7, Math.round((atkIV + defIV + staIV) * 100 / 48));
+                            pstmt.addBatch();
+                            i++;
 
+
+
+                        }
                     }
                 }
+
+                System.out.println("Adding " + name + " (LV" + String.valueOf(level) + ")");// [" + String.valueOf(atkIV) + "/" + String.valueOf(defIV) + "/" + String.valueOf(staIV) + "] to Database!");
+                pstmt.executeBatch();
+                conn.commit();
+
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
             }
 
         }
     }
 
 
-    public void insertNiaStats(String name, double level, int CP, int atkIV, int defIV, int staIV) {
+    public void insertNiaStats(String name, double level, int CP, int atkIV, int defIV, int staIV, Connection conn) {
         String sql = "INSERT INTO NiaPkmnStats(Name, Level, Cp, Atkiv, Defiv, Staiv, IvPercent) VALUES (?,?,?,?,?,?,?)";
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             pstmt.setDouble(2, level);
             pstmt.setInt(3, CP);
